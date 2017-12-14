@@ -1,0 +1,4 @@
+suites:
+    default:
+        namespace: Webit\MessageBus\Infrastructure\Symfony\EventDispatcher
+        psr4_prefix: Webit\MessageBus\Infrastructure\Symfony\EventDispatcher

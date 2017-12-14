@@ -1,0 +1,43 @@
+{
+    "name": "webit/message-bus-sf-event-dispatcher",
+    "type": "library",
+    "keywords": ["message bus", "message queue", "symfony", "event dispatcher"],
+    "authors": [{
+        "name": "Daniel Bojdo",
+        "email": "daniel.bojdo@web-it.eu"
+    }],
+    "license": "MIT",
+    "require": {
+        "php": ">=7.0",
+        "webit/message-bus": "^1.0.0",
+        "symfony/event-dispatcher": "^3.0|^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Webit\\MessageBus\\Infrastructure\\Symfony\\EventDispatcher\\": "src/"
+        }
+    },
+    "provide": {
+        "webit/message-bus-infrastructure": "1.0.0"
+    },
+    "require-dev": {
+        "jms/serializer": "^1.0.0",
+        "phpspec/phpspec": "^4.2.0",
+        "webit/test-tools": "^1.0.0"
+    },
+    "suggest": {
+        "jms/serializer": "To use Symfony Event Factory"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "spec\\Webit\\MessageBus\\Infrastructure\\Symfony\\EventDispatcher\\": "spec/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    },
+    "prefer-stable": true,
+    "minimum-stability": "dev"
+}

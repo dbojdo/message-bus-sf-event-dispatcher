@@ -1,0 +1,19 @@
+version: '2'
+services:
+    src:
+        build : ./docker/php
+        volumes:
+            - .:/var/www/html
+            - ./docker/php/config:/usr/local/etc/php/conf.d
+            - ~/.composer:/root/.composer
+        working_dir: /var/www/html
+
+    spec:
+        extends:
+          service: src
+        command: ./vendor/bin/phpspec run
+
+    composer:
+        extends:
+            service: src
+        command: composer install -o -n
