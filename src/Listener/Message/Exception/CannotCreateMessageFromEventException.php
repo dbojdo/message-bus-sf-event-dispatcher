@@ -2,16 +2,16 @@
 
 namespace Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Listener\Message\Exception;
 
-use Symfony\Component\EventDispatcher\Event;
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\MessageBusEvent;
 
 class CannotCreateMessageFromEventException extends AbstractMessageFromEventException
 {
-    protected static function exceptionMessage(string $eventName, Event $event): string
+    protected static function exceptionMessage(MessageBusEvent $event): string
     {
         return sprintf(
             'Could not create Message from Event of name "%s" and class "%s"',
-            $eventName,
-            get_class($event)
+            $event->name(),
+            get_class($event->event())
         );
     }
 }

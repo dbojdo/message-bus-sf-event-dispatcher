@@ -6,6 +6,7 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Webit\MessageBus\Consumer;
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Listener\Message\MessageFromEventFactory;
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\MessageBusEvent;
 
 final class EventConsumingListener implements EventDispatcherListener
 {
@@ -31,7 +32,7 @@ final class EventConsumingListener implements EventDispatcherListener
      */
     public function onEvent(Event $event, $eventName, EventDispatcherInterface $eventDispatcher)
     {
-        $message = $this->messageFromEvent->create($eventName, $event);
+        $message = $this->messageFromEvent->create(new MessageBusEvent($eventName, $event));
         $this->consumer->consume($message);
     }
 }

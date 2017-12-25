@@ -22,23 +22,21 @@ class GenericMessageFromEventFactorySpec extends AbstractObjectBehaviour
 
     function it_creates_message_from_event(EventSerialiser $eventSerialiser, MessageTypeResolver $messageTypeResolver)
     {
-        $eventName = $this->randomString();
-        $event = $this->createEvent();
+        $messageBusEvent = $this->createMessageBusEvent();
 
-        $messageTypeResolver->resolve($eventName, $event)->willReturn($messageType = $this->randomString());
-        $eventSerialiser->serialise($eventName, $event)->willReturn($messageContent = $this->randomString());
+        $messageTypeResolver->resolve($messageBusEvent)->willReturn($messageType = $this->randomString());
+        $eventSerialiser->serialise($messageBusEvent)->willReturn($messageContent = $this->randomString());
 
-        $this->create($eventName, $event)->shouldBeLike(new Message($messageType, $messageContent));
+        $this->create($messageBusEvent)->shouldBeLike(new Message($messageType, $messageContent));
     }
 
     function it_uses_event_name_as_message_type_by_default(EventSerialiser $eventSerialiser)
     {
         $this->beConstructedWith($eventSerialiser);
 
-        $eventName = $this->randomString();
-        $event = $this->createEvent();
-        $eventSerialiser->serialise($eventName, $event)->willReturn($messageContent = $this->randomString());
+        $messageBusEvent = $this->createMessageBusEvent();
+        $eventSerialiser->serialise($messageBusEvent)->willReturn($messageContent = $this->randomString());
 
-        $this->create($eventName, $event)->shouldBeLike(new Message($eventName, $messageContent));
+        $this->create($messageBusEvent)->shouldBeLike(new Message($messageBusEvent->name(), $messageContent));
     }
 }

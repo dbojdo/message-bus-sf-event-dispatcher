@@ -7,6 +7,7 @@ use spec\Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\AbstractObjectB
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Listener\Message\Exception\UnsupportedEventException;
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Listener\Message\FallingBackMessageFromEventFactory;
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Listener\Message\MessageFromEventFactory;
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\MessageBusEvent;
 
 class FallingBackMessageFromEventFactorySpec extends AbstractObjectBehaviour
 {
@@ -24,27 +25,31 @@ class FallingBackMessageFromEventFactorySpec extends AbstractObjectBehaviour
         MessageFromEventFactory $mainFactory,
         MessageFromEventFactory $fallbackFactory
     ) {
+        $messageBusEvent = $this->createMessageBusEvent();
+
         $mainFactory
-            ->create($eventName = $this->randomString(), $event = $this->createEvent())
+            ->create($messageBusEvent)
             ->willReturn($message = $this->createMessage());
 
-        $fallbackFactory->create(Argument::any(), Argument::any())->shouldNotBeCalled();
+        $fallbackFactory->create($messageBusEvent)->shouldNotBeCalled();
 
-        $this->create($eventName, $event)->shouldBe($message);
+        $this->create($messageBusEvent)->shouldBe($message);
     }
 
     function it_uses_fallback_factory_when_main_fails(
         MessageFromEventFactory $mainFactory,
         MessageFromEventFactory $fallbackFactory
     ) {
+        $messageBusEvent = $this->createMessageBusEvent();
+
         $mainFactory
-            ->create($eventName = $this->randomString(), $event = $this->createEvent())
+            ->create($messageBusEvent)
             ->willThrow(UnsupportedEventException::class);
 
         $fallbackFactory
-            ->create($eventName, $event)
+            ->create($messageBusEvent)
             ->willReturn($message = $this->createMessage());
 
-        $this->create($eventName, $event)->shouldBe($message);
+        $this->create($messageBusEvent)->shouldBe($message);
     }
 }

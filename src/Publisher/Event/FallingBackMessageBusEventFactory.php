@@ -2,23 +2,24 @@
 
 namespace Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event;
 
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\MessageBusEvent;
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\Exception\EventFromMessageException;
 use Webit\MessageBus\Message;
 
-final class FallingBackEventToBeDispatchedFactory implements EventToBeDispatchedFactory
+final class FallingBackMessageBusEventFactory implements MessageBusEventFactory
 {
-    /** @var EventToBeDispatchedFactory */
+    /** @var MessageBusEventFactory */
     private $innerFactory;
 
-    /** @var EventToBeDispatchedFactory */
+    /** @var MessageBusEventFactory */
     private $fallbackFactory;
 
     /**
      * FallingBackEventFromMessageFactory constructor.
-     * @param EventToBeDispatchedFactory $innerFactory
-     * @param EventToBeDispatchedFactory $fallbackFactory
+     * @param MessageBusEventFactory $innerFactory
+     * @param MessageBusEventFactory $fallbackFactory
      */
-    public function __construct(EventToBeDispatchedFactory $innerFactory, EventToBeDispatchedFactory $fallbackFactory)
+    public function __construct(MessageBusEventFactory $innerFactory, MessageBusEventFactory $fallbackFactory)
     {
         $this->innerFactory = $innerFactory;
         $this->fallbackFactory = $fallbackFactory;
@@ -27,7 +28,7 @@ final class FallingBackEventToBeDispatchedFactory implements EventToBeDispatched
     /**
      * @inheritdoc
      */
-    public function create(Message $message): EventToBeDispatched
+    public function create(Message $message): MessageBusEvent
     {
         try {
             return $this->innerFactory->create($message);

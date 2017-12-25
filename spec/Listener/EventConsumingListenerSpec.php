@@ -7,6 +7,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Webit\MessageBus\Consumer;
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Listener\EventConsumingListener;
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Listener\Message\MessageFromEventFactory;
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\MessageBusEvent;
 
 class EventConsumingListenerSpec extends AbstractObjectBehaviour
 {
@@ -28,7 +29,9 @@ class EventConsumingListenerSpec extends AbstractObjectBehaviour
         $eventName = $this->randomString();
         $event = $this->createEvent();
 
-        $messageFromEvent->create($eventName, $event)->willReturn($message = $this->createMessage());
+        $messageBusEvent = new MessageBusEvent($eventName, $event);
+
+        $messageFromEvent->create($messageBusEvent)->willReturn($message = $this->createMessage());
         $consumer->consume($message)->shouldBeCalled();
 
         $this->onEvent($event, $eventName, $eventDispatcher);

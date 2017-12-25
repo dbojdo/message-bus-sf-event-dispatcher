@@ -3,7 +3,7 @@
 namespace Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\EventToBeDispatchedFactory;
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\MessageBusEventFactory;
 use Webit\MessageBus\Message;
 use Webit\MessageBus\Publisher;
 
@@ -12,20 +12,20 @@ final class EventDispatcherPublisher implements Publisher
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
-    /** @var EventToBeDispatchedFactory */
-    private $eventToBeDispatchedFactory;
+    /** @var MessageBusEventFactory */
+    private $messageBusEventFactory;
 
     /**
      * EventDispatcherPublisher constructor.
      * @param EventDispatcherInterface $eventDispatcher
-     * @param EventToBeDispatchedFactory $eventToBeDispatchedFactory
+     * @param MessageBusEventFactory $eventToBeDispatchedFactory
      */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
-        EventToBeDispatchedFactory $eventToBeDispatchedFactory
+        MessageBusEventFactory $eventToBeDispatchedFactory
     ) {
         $this->eventDispatcher = $eventDispatcher;
-        $this->eventToBeDispatchedFactory = $eventToBeDispatchedFactory;
+        $this->messageBusEventFactory = $eventToBeDispatchedFactory;
     }
 
     /**
@@ -33,7 +33,7 @@ final class EventDispatcherPublisher implements Publisher
      */
     public function publish(Message $message)
     {
-        $eventToBeDispatched = $this->eventToBeDispatchedFactory->create($message);
-        $this->eventDispatcher->dispatch($eventToBeDispatched->eventName(), $eventToBeDispatched->event());
+        $messageBusEvent = $this->messageBusEventFactory->create($message);
+        $this->eventDispatcher->dispatch($messageBusEvent->name(), $messageBusEvent->event());
     }
 }

@@ -2,12 +2,12 @@
 
 namespace Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Listener\Message\Type;
 
-use Symfony\Component\EventDispatcher\Event;
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\MessageBusEvent;
 
 final class EventNameMessageTypeResolver implements MessageTypeResolver
 {
-    public function resolve(string $eventName, Event $event): string
+    public function resolve(MessageBusEvent $event): string
     {
-        return $eventName;
+        return $event->name();
     }
 }

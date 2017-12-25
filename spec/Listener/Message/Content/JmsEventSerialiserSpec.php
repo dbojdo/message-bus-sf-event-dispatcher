@@ -26,61 +26,58 @@ class JmsEventSerialiserSpec extends AbstractObjectBehaviour
         SerializerInterface $serializer,
         SerialisationDataProvider $dataProvider
     ) {
-        $eventName = $this->randomString();
-        $event = $this->createEvent();
-        $dataProvider->getData($eventName, $event)->willReturn($dataToBeSerialised = [$this->randomString()]);
+        $messageBusEvent = $this->createMessageBusEvent();
+
+        $dataProvider->getData($messageBusEvent)->willReturn($dataToBeSerialised = [$this->randomString()]);
 
         $serializer
             ->serialize(
                 $dataToBeSerialised,
                 JmsEventSerialiser::FORMAT_XML,
-                $this->createContext($eventName, $event)
+                $this->createContext($messageBusEvent)
             )
             ->willReturn($serialisedData = $this->randomString());
 
-        $this->serialise($eventName, $event)->shouldBe($serialisedData);
+        $this->serialise($messageBusEvent)->shouldBe($serialisedData);
     }
 
     function it_serialises_plain_event_when_data_provider_not_set(SerializerInterface $serializer)
     {
         $this->beConstructedWith($serializer, null, JmsEventSerialiser::FORMAT_XML);
 
-        $eventName = $this->randomString();
-        $event = $this->createEvent();
+        $messageBusEvent = $this->createMessageBusEvent();
 
         $serializer
             ->serialize(
-                $event,
+                $messageBusEvent->event(),
                 JmsEventSerialiser::FORMAT_XML,
-                $this->createContext($eventName, $event)
+                $this->createContext($messageBusEvent)
             )
             ->willReturn($serialisedData = $this->randomString());
 
-        $this->serialise($eventName, $event)->shouldBe($serialisedData);
+        $this->serialise($messageBusEvent)->shouldBe($serialisedData);
     }
 
     function it_serialises_to_json_when_format_not_set(SerializerInterface $serializer)
     {
         $this->beConstructedWith($serializer);
 
-        $eventName = $this->randomString();
-        $event = $this->createEvent();
+        $messageBusEvent = $this->createMessageBusEvent();
 
         $serializer
             ->serialize(
-                $event,
+                $messageBusEvent->event(),
                 JmsEventSerialiser::FORMAT_JSON,
-                $this->createContext($eventName, $event)
+                $this->createContext($messageBusEvent)
             )
             ->willReturn($serialisedData = $this->randomString());
 
-        $this->serialise($eventName, $event)->shouldBe($serialisedData);
+        $this->serialise($messageBusEvent)->shouldBe($serialisedData);
     }
 
-    private function createContext($eventName, $event)
+    private function createContext($event)
     {
         $serializationContext = SerializationContext::create();
-        $serializationContext->attributes->set('eventName', $eventName);
         $serializationContext->attributes->set('event', $event);
 
         return$serializationContext;

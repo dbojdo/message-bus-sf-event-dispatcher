@@ -14,6 +14,7 @@ class EventOnlySerialisationDataProviderSpec extends AbstractObjectBehaviour
 
     function it_returns_event_as_data()
     {
-        $this->getData($this->randomString(), $event = $this->createEvent())->shouldBe($event);
+        $messageBusEvent = $this->createMessageBusEvent();
+        $this->getData($messageBusEvent)->shouldBe($messageBusEvent->event());
     }
 }

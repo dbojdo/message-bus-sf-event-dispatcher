@@ -2,15 +2,15 @@
 
 namespace Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Listener\Message\Content;
 
-use Symfony\Component\EventDispatcher\Event;
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\MessageBusEvent;
 
 final class EventOnlySerialisationDataProvider implements SerialisationDataProvider
 {
     /**
      * @inheritdoc
      */
-    public function getData(string $eventName, Event $event)
+    public function getData(MessageBusEvent $event)
     {
-        return $event;
+        return $event->event();
     }
 }

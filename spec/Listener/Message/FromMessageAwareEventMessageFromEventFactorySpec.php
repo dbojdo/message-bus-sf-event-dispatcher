@@ -16,24 +16,24 @@ class FromMessageAwareEventMessageFromEventFactorySpec extends AbstractObjectBeh
         $this->shouldHaveType(FromMessageAwareEventMessageFromEventFactory::class);
     }
 
-    function it_creates_message_from_message_aware_event(MessageAwareEventStub $event)
+    function it_creates_message_from_message_aware_event()
     {
-        $eventName = $this->randomString();
-        $event->createMessage($eventName)->willReturn($message = $this->createMessage());
+        $messageBusEvent = $this->createMessageBusEvent(null, $event = new MessageAwareEventFake());
 
-        $this->create($eventName, $event)->shouldBe($message);
+        $this->create($messageBusEvent)->shouldBeLike($event->createMessage($messageBusEvent->name()));
     }
 
     function it_throws_exception_if_non_message_aware_event_passed()
     {
         $this->shouldThrow(EventNotMessageAwareException::class)
-            ->duringCreate($this->randomString(), $this->createEvent());
+            ->duringCreate($this->createMessageBusEvent());
     }
 }
 
-class MessageAwareEventStub extends Event implements MessageAwareEvent
+class MessageAwareEventFake extends Event implements MessageAwareEvent
 {
     public function createMessage(string $eventName): Message
     {
+        return new Message($eventName, 'some-data');
     }
 }

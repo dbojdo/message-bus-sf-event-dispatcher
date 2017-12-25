@@ -2,14 +2,13 @@
 
 namespace Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Listener\Message\Content;
 
-use Symfony\Component\EventDispatcher\Event;
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\MessageBusEvent;
 
 interface SerialisationDataProvider
 {
     /**
-     * @param string $eventName
-     * @param Event $event
+     * @param MessageBusEvent $event
      * @return mixed
      */
-    public function getData(string $eventName, Event $event);
+    public function getData(MessageBusEvent $event);
 }

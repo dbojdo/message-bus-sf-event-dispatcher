@@ -24,8 +24,7 @@ class ByEventNameMessageFromEventFactorySpec extends AbstractObjectBehaviour
 
     function it_uses_factory_by_event_name(
         MessageFromEventFactory $factory1,
-        MessageFromEventFactory $factory2,
-        Event $event
+        MessageFromEventFactory $factory2
     ){
         $factories = [
             $eventName1 = $this->randomString() => $factory1,
@@ -33,15 +32,16 @@ class ByEventNameMessageFromEventFactorySpec extends AbstractObjectBehaviour
         ];
         $this->beConstructedWith($factories);
 
-        $factory2->create($eventName2, $event)->willReturn($message = $this->createMessage());
-        $factory1->create(Argument::any(), Argument::any())->shouldNotBeCalled();
-        $this->create($eventName2, $event)->shouldBe($message);
+        $messageBusEvent = $this->createMessageBusEvent($eventName2);
+
+        $factory2->create($messageBusEvent)->willReturn($message = $this->createMessage());
+        $factory1->create($messageBusEvent)->shouldNotBeCalled();
+        $this->create($messageBusEvent)->shouldBe($message);
     }
 
     function it_throws_exception_if_no_matching_factory(
         MessageFromEventFactory $factory1,
-        MessageFromEventFactory $factory2,
-        Event $event
+        MessageFromEventFactory $factory2
     ){
         $factories = [
             $eventName1 = $this->randomString() => $factory1,
@@ -49,9 +49,11 @@ class ByEventNameMessageFromEventFactorySpec extends AbstractObjectBehaviour
         ];
         $this->beConstructedWith($factories);
 
-        $factory1->create(Argument::any(), Argument::any())->shouldNotBeCalled();
-        $factory2->create(Argument::any(), Argument::any())->shouldNotBeCalled();
+        $messageBusEvent = $this->createMessageBusEvent($this->randomString());
 
-        $this->shouldThrow(UnsupportedEventException::class)->duringCreate($this->randomString(), $event);
+        $factory1->create($messageBusEvent)->shouldNotBeCalled();
+        $factory2->create($messageBusEvent)->shouldNotBeCalled();
+
+        $this->shouldThrow(UnsupportedEventException::class)->duringCreate($messageBusEvent);
     }
 }

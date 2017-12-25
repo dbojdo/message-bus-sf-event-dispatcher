@@ -4,15 +4,15 @@ namespace spec\Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher
 
 use spec\Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\AbstractObjectBehaviour;
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\EventToBeDispatched;
-use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\GenericEventToBeDispatchedFactory;
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\GenericMessageBusEventFactory;
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\Name\EventNameResolver;
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\Symfony\SymfonyEventFactory;
 
-class GenericEventToBeDispatchedFactorySpec extends AbstractObjectBehaviour
+class GenericMessageBusEventFactorySpec extends AbstractObjectBehaviour
 {
     function it_is_initializable()
     {
-        $this->shouldHaveType(GenericEventToBeDispatchedFactory::class);
+        $this->shouldHaveType(GenericMessageBusEventFactory::class);
     }
 
     function let(SymfonyEventFactory $factory, EventNameResolver $eventNameResolver)
@@ -27,7 +27,7 @@ class GenericEventToBeDispatchedFactorySpec extends AbstractObjectBehaviour
         $eventNameResolver->resolve($message)->willReturn($eventName = $this->randomString());
         $factory->create($message)->willReturn($symfonyEvent = $this->createEvent());
 
-        $this->create($message)->shouldBeLike(new EventToBeDispatched($eventName, $symfonyEvent));
+        $this->create($message)->shouldBeLike($this->createMessageBusEvent($eventName, $symfonyEvent));
     }
 
     function it_takes_event_name_from_message_type_if_name_resolver_not_set(
@@ -38,6 +38,6 @@ class GenericEventToBeDispatchedFactorySpec extends AbstractObjectBehaviour
         $message = $this->createMessage();
         $factory->create($message)->willReturn($symfonyEvent = $this->createEvent());
 
-        $this->create($message)->shouldBeLike(new EventToBeDispatched($message->type(), $symfonyEvent));
+        $this->create($message)->shouldBeLike($this->createMessageBusEvent($message->type(), $symfonyEvent));
     }
 }

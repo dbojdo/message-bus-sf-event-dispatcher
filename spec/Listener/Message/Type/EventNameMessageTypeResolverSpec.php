@@ -14,6 +14,7 @@ class EventNameMessageTypeResolverSpec extends AbstractObjectBehaviour
 
     function it_returns_event_name_as_message_type()
     {
-        $this->resolve($eventName = $this->randomString(), $this->createEvent())->shouldBe($eventName);
+        $messageBusEvent = $this->createMessageBusEvent();
+        $this->resolve($messageBusEvent)->shouldBe($messageBusEvent->name());
     }
 }

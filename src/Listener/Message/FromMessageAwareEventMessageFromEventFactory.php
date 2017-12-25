@@ -2,18 +2,19 @@
 
 namespace Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Listener\Message;
 
-use Symfony\Component\EventDispatcher\Event;
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Listener\Message\Exception\EventNotMessageAwareException;
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\MessageBusEvent;
 use Webit\MessageBus\Message;
 
 final class FromMessageAwareEventMessageFromEventFactory implements MessageFromEventFactory
 {
-    public function create(string $eventName, Event $event): Message
+    public function create(MessageBusEvent $event): Message
     {
-        if ($event instanceof MessageAwareEvent) {
-            return $event->createMessage($eventName);
+        $sfEvent = $event->event();
+        if ($sfEvent instanceof MessageAwareEvent) {
+            return $sfEvent->createMessage($event->name());
         }
 
-        throw EventNotMessageAwareException::fromEvent($eventName, $event);
+        throw EventNotMessageAwareException::fromEvent($event);
     }
 }

@@ -2,8 +2,8 @@
 
 namespace Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Listener\Message;
 
-use Symfony\Component\EventDispatcher\Event;
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Listener\Message\Exception\UnsupportedEventException;
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\MessageBusEvent;
 use Webit\MessageBus\Message;
 
 final class ByEventNameMessageFromEventFactory implements MessageFromEventFactory
@@ -20,12 +20,12 @@ final class ByEventNameMessageFromEventFactory implements MessageFromEventFactor
         $this->factories = $factories;
     }
 
-    public function create(string $eventName, Event $event): Message
+    public function create(MessageBusEvent $event): Message
     {
-        if (isset($this->factories[$eventName])) {
-            return $this->factories[$eventName]->create($eventName, $event);
+        if (isset($this->factories[$event->name()])) {
+            return $this->factories[$event->name()]->create($event);
         }
 
-        throw UnsupportedEventException::fromEvent($eventName, $event);
+        throw UnsupportedEventException::fromEvent($event);
     }
 }

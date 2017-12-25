@@ -2,13 +2,14 @@
 
 namespace Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event;
 
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\MessageBusEvent;
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\Exception\CannotCreateEventFromMessageException;
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\Name\EventNameResolver;
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\Name\FromMessageTypeEventNameResolver;
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\Symfony\SymfonyEventFactory;
 use Webit\MessageBus\Message;
 
-final class GenericEventToBeDispatchedFactory implements EventToBeDispatchedFactory
+final class GenericMessageBusEventFactory implements MessageBusEventFactory
 {
     /** @var SymfonyEventFactory */
     private $symfonyEventFactory;
@@ -17,7 +18,6 @@ final class GenericEventToBeDispatchedFactory implements EventToBeDispatchedFact
     private $eventNameResolver;
 
     /**
-     * GenericEventToBeDispatchedFactory constructor.
      * @param SymfonyEventFactory $symfonyEventFactory
      * @param EventNameResolver $eventNameResolver
      */
@@ -30,10 +30,10 @@ final class GenericEventToBeDispatchedFactory implements EventToBeDispatchedFact
     /**
      * @inheritdoc
      */
-    public function create(Message $message): EventToBeDispatched
+    public function create(Message $message): MessageBusEvent
     {
         try {
-            return new EventToBeDispatched(
+            return new MessageBusEvent(
                 $this->eventNameResolver->resolve($message),
                 $this->symfonyEventFactory->create($message)
             );

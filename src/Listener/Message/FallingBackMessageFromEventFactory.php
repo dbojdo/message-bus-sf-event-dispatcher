@@ -2,8 +2,8 @@
 
 namespace Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Listener\Message;
 
-use Symfony\Component\EventDispatcher\Event;
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Listener\Message\Exception\MessageFromEventException;
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\MessageBusEvent;
 use Webit\MessageBus\Message;
 
 final class FallingBackMessageFromEventFactory implements MessageFromEventFactory
@@ -25,12 +25,12 @@ final class FallingBackMessageFromEventFactory implements MessageFromEventFactor
         $this->fallbackFactory = $fallbackFactory;
     }
 
-    public function create(string $eventName, Event $event): Message
+    public function create(MessageBusEvent $event): Message
     {
         try {
-            return $this->factory->create($eventName, $event);
+            return $this->factory->create($event);
         } catch (MessageFromEventException $e) {
-            return $this->fallbackFactory->create($eventName, $event);
+            return $this->fallbackFactory->create($event);
         }
     }
 }

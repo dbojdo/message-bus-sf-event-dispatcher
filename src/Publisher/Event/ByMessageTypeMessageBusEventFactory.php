@@ -2,17 +2,18 @@
 
 namespace Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event;
 
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\MessageBusEvent;
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\Exception\UnsupportedMessageTypeException;
 use Webit\MessageBus\Message;
 
-final class ByMessageTypeEventToBeDispatchedFactory implements EventToBeDispatchedFactory
+final class ByMessageTypeMessageBusEventFactory implements MessageBusEventFactory
 {
-    /** @var EventToBeDispatchedFactory[] */
+    /** @var MessageBusEventFactory[] */
     private $eventFromMessageFactories;
 
     /**
      * ByMessageTypeEventFromMessageFactory constructor.
-     * @param EventToBeDispatchedFactory[] $eventFromMessageFactories
+     * @param MessageBusEventFactory[] $eventFromMessageFactories
      */
     public function __construct(array $eventFromMessageFactories)
     {
@@ -22,7 +23,7 @@ final class ByMessageTypeEventToBeDispatchedFactory implements EventToBeDispatch
     /**
      * @inheritdoc
      */
-    public function create(Message $message): EventToBeDispatched
+    public function create(Message $message): MessageBusEvent
     {
         if (isset($this->eventFromMessageFactories[$message->type()])) {
             return $this->eventFromMessageFactories[$message->type()]->create($message);

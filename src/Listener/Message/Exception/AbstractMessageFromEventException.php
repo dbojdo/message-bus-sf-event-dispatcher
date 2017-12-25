@@ -2,49 +2,32 @@
 
 namespace Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Listener\Message\Exception;
 
-use Symfony\Component\EventDispatcher\Event;
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\MessageBusEvent;
 
 abstract class AbstractMessageFromEventException extends \RuntimeException implements MessageFromEventException
 {
-    /** @var string */
-    private $eventName;
-
-    /** @var Event */
+    /** @var MessageBusEvent */
     private $event;
 
     public static function fromEvent(
-        string $eventName,
-        Event $event,
+        MessageBusEvent $event,
         $code = 0,
         \Exception $previous = null
     ): MessageFromEventException {
         $exception = new static(
-            static::exceptionMessage($eventName, $event),
+            static::exceptionMessage($event),
             $code,
             $previous
         );
 
-        $exception->eventName = $eventName;
         $exception->event = $event;
 
         return $exception;
     }
-
-    /**
-     * @return string
-     */
-    public function eventName(): string
-    {
-        return $this->eventName;
-    }
-
-    /**
-     * @return Event
-     */
-    public function event(): Event
+    public function event(): MessageBusEvent
     {
         return $this->event;
     }
 
-    abstract protected static function exceptionMessage(string $eventName, Event $event): string;
+    abstract protected static function exceptionMessage(MessageBusEvent $event): string;
 }

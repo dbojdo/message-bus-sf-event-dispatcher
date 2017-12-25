@@ -3,39 +3,39 @@
 namespace spec\Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event;
 
 use spec\Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\AbstractObjectBehaviour;
-use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\EventToBeDispatchedFactory;
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\MessageBusEventFactory;
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\Exception\CannotCreateEventFromMessageException;
-use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\FallingBackEventToBeDispatchedFactory;
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\FallingBackMessageBusEventFactory;
 use Prophecy\Argument;
 
-class FallingBackEventToBeDispatchedFactorySpec extends AbstractObjectBehaviour
+class FallingBackMessageBusEventFactorySpec extends AbstractObjectBehaviour
 {
     function it_is_initializable()
     {
-        $this->shouldHaveType(FallingBackEventToBeDispatchedFactory::class);
+        $this->shouldHaveType(FallingBackMessageBusEventFactory::class);
     }
 
-    function let(EventToBeDispatchedFactory $mainFactory, EventToBeDispatchedFactory $fallbackFactory)
+    function let(MessageBusEventFactory $mainFactory, MessageBusEventFactory $fallbackFactory)
     {
         $this->beConstructedWith($mainFactory, $fallbackFactory);
     }
 
     function it_creates_event_with_main_factory(
-        EventToBeDispatchedFactory $mainFactory,
-        EventToBeDispatchedFactory $fallbackFactory
+        MessageBusEventFactory $mainFactory,
+        MessageBusEventFactory $fallbackFactory
     ) {
-        $mainFactory->create($message = $this->createMessage())->willReturn($event = $this->createEventToBeDispatched());
+        $mainFactory->create($message = $this->createMessage())->willReturn($event = $this->createMessageBusEvent());
         $fallbackFactory->create(Argument::any())->shouldNotBeCalled();
 
         $this->create($message)->shouldBe($event);
     }
 
     function it_uses_fallback_factory_on_main_factory_exception(
-        EventToBeDispatchedFactory $mainFactory,
-        EventToBeDispatchedFactory $fallbackFactory
+        MessageBusEventFactory $mainFactory,
+        MessageBusEventFactory $fallbackFactory
     ) {
         $mainFactory->create($message = $this->createMessage())->willThrow(CannotCreateEventFromMessageException::class);
-        $fallbackFactory->create($message)->willReturn($event = $this->createEventToBeDispatched());
+        $fallbackFactory->create($message)->willReturn($event = $this->createMessageBusEvent());
 
         $this->create($message)->shouldBe($event);
     }

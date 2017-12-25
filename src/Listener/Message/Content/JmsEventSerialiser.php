@@ -5,6 +5,7 @@ namespace Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Listener\Messa
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Component\EventDispatcher\Event;
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\MessageBusEvent;
 
 final class JmsEventSerialiser implements EventSerialiser
 {
@@ -30,20 +31,19 @@ final class JmsEventSerialiser implements EventSerialiser
         $this->format = $format;
     }
 
-    public function serialise(string $eventName, Event $event): string
+    public function serialise(MessageBusEvent $event): string
     {
-        $data = $this->dataProvider->getData($eventName, $event);
+        $data = $this->dataProvider->getData($event);
         return $this->serializer->serialize(
             $data,
             $this->format,
-            $this->createContext($eventName, $event)
+            $this->createContext($event)
         );
     }
 
-    private function createContext(string $eventName, Event $event): SerializationContext
+    private function createContext(MessageBusEvent $event): SerializationContext
     {
         $context = SerializationContext::create();
-        $context->attributes->set('eventName', $eventName);
         $context->attributes->set('event', $event);
 
         return $context;
