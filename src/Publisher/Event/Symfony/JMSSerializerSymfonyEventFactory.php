@@ -5,7 +5,6 @@ namespace Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Even
 use JMS\Serializer\DeserializationContext;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Component\EventDispatcher\Event;
-use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\Exception\CannotCreateEventFromMessageException;
 use Webit\MessageBus\Message;
 
 final class JMSSerializerSymfonyEventFactory implements SymfonyEventFactory
