@@ -3,6 +3,7 @@
 namespace spec\Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\Symfony;
 
 use spec\Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\AbstractObjectBehaviour;
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\Symfony\Exception\DeserializationFailedException;
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\Symfony\PhpUnserializeEventFactory;
 
 class PhpUnserializeEventFactorySpec extends AbstractObjectBehaviour
@@ -17,5 +18,11 @@ class PhpUnserializeEventFactorySpec extends AbstractObjectBehaviour
         $message = $this->createMessage(null, serialize($event = $this->createEvent()));
 
         $this->create($message)->shouldBeLike($event);
+    }
+
+    function it_throws_exception_when_unserialization_fails()
+    {
+        $message = $this->createMessage(null, substr(serialize(new \stdClass()), 0, 8));
+        $this->shouldThrow(DeserializationFailedException::class)->duringCreate($message);
     }
 }

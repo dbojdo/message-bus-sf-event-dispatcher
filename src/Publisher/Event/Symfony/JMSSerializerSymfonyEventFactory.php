@@ -5,6 +5,7 @@ namespace Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Even
 use JMS\Serializer\DeserializationContext;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Component\EventDispatcher\Event;
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\Exception\CannotCreateEventFromMessageException;
 use Webit\MessageBus\Message;
 
 final class JMSSerializerSymfonyEventFactory implements SymfonyEventFactory
@@ -15,24 +16,25 @@ final class JMSSerializerSymfonyEventFactory implements SymfonyEventFactory
     /** @var SerializerInterface */
     private $serializer;
 
-    /** @var string */
-    private $type;
+    /** @var JMSSerializerTypeMap */
+    private $typeMap;
 
     /** @var string */
     private $format;
 
-    public function __construct(SerializerInterface $serializer, string $type, string $format = self::FORMAT_JSON)
+
+    public function __construct(SerializerInterface $serializer, JMSSerializerTypeMap $typeMap, string $format = self::FORMAT_JSON)
     {
         $this->serializer = $serializer;
-        $this->type = $type;
         $this->format = $format;
+        $this->typeMap = $typeMap;
     }
 
     public function create(Message $message): Event
     {
-        $this->serializer->deserialize(
+        return $this->serializer->deserialize(
             $message->content(),
-            $this->type,
+            $this->typeMap->type($message),
             $this->format,
             $this->createContext($message)
         );
