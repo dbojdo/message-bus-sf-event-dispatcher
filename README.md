@@ -14,13 +14,13 @@ composer require webit/message-bus-sf-event-dispatcher=^1.0.0
 
 To publish ***Message*** via Symfony Event Dispatcher use ***EventDispatcherPublisher***
 
-### EventToBeDispatchedFactory
+### MessageBusEventFactory
 
 You need to tell the ***EventDispatcherPublisher*** how to translate your ***Message***
 into the event name and event object of Symfony Event Dispatcher.
-Implement and configure ***EventToBeDispatchedFactory***.
+Implement and configure ***MessageBusEventFactory***.
 
-#### EventToBeDispatchedFactory: Example
+#### MessageBusEventFactory: Example
 Let's say you're going to publish messages of two types: **type-1** and **type-2**
 and you want to map then to two different Events of Symfony Event Dispatcher **Event1** and **Event2**.
 
@@ -64,29 +64,29 @@ class Event2 extends Event
 }
 ```
 
-##### Option 1: implement EventToBeDispatchedFactory
+##### Option 1: implement MessageBusEventFactory
 
 ```php
-use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\EventToBeDispatchedFactory;
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\MessageBusEventFactory;
 
-class Event1ToBeDispatchedFactory implements EventToBeDispatchedFactory
+class MessageBusEvent1Factory implements MessageBusEventFactory
 {
-    public function create(Message $message): EventToBeDispatched
+    public function create(Message $message): MessageBusEventFactory
     {
         $arContent = json_decode($message->content(), true);
-        return new EventToBeDispatched(
+        return new MessageBusEvent(
             $message->type(),
             new Event1(isset($arContent['x']) ? $arContent['x'] : '') 
         );
     }
 }
 
-class Event2ToBeDispatchedFactory implements EventToBeDispatchedFactory
+class MessageBusEvent2Factory implements MessageBusEventFactory
 {
-    public function create(Message $message): EventToBeDispatched
+    public function create(Message $message): MessageBusEventFactory
     {
         $arContent = json_decode($message->content(), true);
-        return new EventToBeDispatched(
+        return new MessageBusEvent(
             $message->type(),
             new Event2(
                 isset($arContent['y']) ? $arContent['y'] : '',
@@ -100,15 +100,15 @@ class Event2ToBeDispatchedFactory implements EventToBeDispatchedFactory
 Then combine both factories together
 
 ```php
-use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\ByMessageTypeEventToBeDispatchedFactory;
-$eventToBeDispatchedFactory = new ByMessageTypeEventToBeDispatchedFactory([
-    'type-1' => new Event1ToBeDispatchedFactory(),
-    'type-2' => new Event2ToBeDispatchedFactory()
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\ByMessageTypeMessageBusEventFactory;
+$messageBusEventFactory = new ByMessageTypeMessageBusEventFactory([
+    'type-1' => new MessageBusEvent1Factory(),
+    'type-2' => new MessageBusEvent2Factory()
 ]);
 ```
 
 
-##### Option 2: Use GenericEventToBeDispatcherFactory and implement its dependencies
+##### Option 2: Use GenericMessageBusEventFactory and implement its dependencies
 
 ```php
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\Symfony\CallbackSymfonyEventFactory;
@@ -116,7 +116,7 @@ use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\Symf
 $eventFactory1 = new CallbackSymfonyEventFactory(
     function (Message $message) {
         $arContent = json_decode($message->content(), true);
-        return new EventToBeDispatched(
+        return new MessageBusEvent(
             $message->type(),
             new Event1(isset($arContent['x']) ? $arContent['x'] : '') 
         );
@@ -126,7 +126,7 @@ $eventFactory1 = new CallbackSymfonyEventFactory(
 $eventFactory2 = new CallbackSymfonyEventFactory(
     function (Message $message) {
         $arContent = json_decode($message->content(), true);
-        return new EventToBeDispatched(
+        return new MessageBusEvent(
             $message->type(),
             new Event2(
                 isset($arContent['y']) ? $arContent['y'] : '',
@@ -140,30 +140,30 @@ $eventFactory2 = new CallbackSymfonyEventFactory(
 then
 
 ```php
-use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\GenericEventToBeDispatchedFactory;
-$eventToBeDispatchedFactory1 = new GenericEventToBeDispatchedFactory(
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\GenericMessageBusEventFactory;
+$messageBusEventFactory1 = new GenericMessageBusEventFactory(
     $eventFactory1,
     new FromMessageTypeEventNameResolver() // optional, used be default, you can provide a different implemenation
 );
 
-$eventToBeDispatchedFactory2 = new GenericEventToBeDispatchedFactory(
+$messageBusEventFactory2 = new GenericMessageBusEventFactory(
     $eventFactory2
 );
 
 // combine both factories together
-use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\ByMessageTypeEventToBeDispatchedFactory;
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\ByMessageTypeMessageBusEventFactory;
 
-$eventToBeDispatchedFactory = new ByMessageTypeEventToBeDispatchedFactory([
-    'type-1' => $eventToBeDispatchedFactory1,
-    'type-2' => $eventToBeDispatchedFactory2
+$messageBusEventFactory = new ByMessageTypeMessageBusEventFactory([
+    'type-1' => $messageBusEventFactory1,
+    'type-2' => $messageBusEventFactory2
 ]);
 ```
 
 ##### Option 3: Implement your own strategy
 
-As ***EventDispatcherPublisher*** expects an interface ***EventToBeDispatchedFactory*** as a dependency,
+As ***EventDispatcherPublisher*** expects an interface ***MessageBusEventFactory*** as a dependency,
 you can provide your own implementation for it. Also you can provide and combine
-inner interfaces used by ***GenericEventToBeDispatchedFactory***: ***SymfonyEventFactory*** and ***EventNameResolver***.
+inner interfaces used by ***GenericMessageBusEventFactory***: ***SymfonyEventFactory*** and ***EventNameResolver***.
 
 If you like [JMSSerializer](https://jmsyst.com/libs/serializer) to produce Symfony Event object, use ***JMSSerializerSymfonyEventFactory***.
 
@@ -178,7 +178,7 @@ $eventDispatcher = new EventDispatcher();
 
 $publisher = new EventDispatcherPublisher(
     $eventDispatcher,
-    $eventToBeDispatchedFactory
+    $messageBusEventFactory
 );
 
 $message = new Message('type-1', '{"x":"some-x"}');
@@ -217,10 +217,11 @@ use Symfony\Component\EventDispatcher\Event;
 
 class Event1Serializer implements EventSerialiser
 {
-    public function serialise(string $eventName, Event $event): string
+    public function serialise(MessageBusEvent $event): string
     {
-        if ($event instanceof Event1) {
-            return json_encode(['x' => $event->x()]);
+        $symfonyEvent = $event->event();
+        if ($symfonyEvent instanceof Event1) {
+            return json_encode(['x' => $symfonyEvent->x()]);
         }
         throw new \InvalidArgumentException('Event must be an instance of Event1.');
     }

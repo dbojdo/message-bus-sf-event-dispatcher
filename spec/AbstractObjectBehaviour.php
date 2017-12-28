@@ -6,7 +6,6 @@ use PhpSpec\ObjectBehavior;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\MessageBusEvent;
-use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\EventToBeDispatched;
 use Webit\MessageBus\Message;
 use Webit\Tests\Unit\RandomValuesTrait;
 
