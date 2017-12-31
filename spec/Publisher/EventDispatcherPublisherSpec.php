@@ -5,11 +5,12 @@ namespace spec\Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher
 use Prophecy\Argument;
 use spec\Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\AbstractObjectBehaviour;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Webit\MessageBus\Exception\MessagePublicationException;
+use Webit\MessageBus\Publisher\Exception\CannotPublishMessageException;
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\Exception\CannotCreateEventFromMessageException;
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\MessageBusEventFactory;
 use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\EventDispatcherPublisher;
-
+use Webit\MessageBus\Publisher\Exception\UnsupportedMessageTypeException;
+use Webit\MessageBus\Infrastructure\Symfony\EventDispatcher\Publisher\Event\Exception\UnsupportedMessageTypeException as SymfonyUnsupportedMessageTypeException;
 class EventDispatcherPublisherSpec extends AbstractObjectBehaviour
 {
     function it_is_initializable()
@@ -43,6 +44,16 @@ class EventDispatcherPublisherSpec extends AbstractObjectBehaviour
         $messageBusEventFactory->create($message)->willThrow(CannotCreateEventFromMessageException::class);
         $eventDispatcher->dispatch(Argument::any(), Argument::any())->shouldNotBeCalled();
 
-        $this->shouldThrow(MessagePublicationException::class)->duringPublish($message);
+        $this->shouldThrow(CannotPublishMessageException::class)->duringPublish($message);
+    }
+
+    function it_throws_unsupported_message_type_exception_when_message_not_supported(EventDispatcherInterface $eventDispatcher, MessageBusEventFactory $messageBusEventFactory)
+    {
+        $message = $this->createMessage();
+
+        $messageBusEventFactory->create($message)->willThrow(SymfonyUnsupportedMessageTypeException::class);
+        $eventDispatcher->dispatch(Argument::any(), Argument::any())->shouldNotBeCalled();
+
+        $this->shouldThrow(UnsupportedMessageTypeException::class)->duringPublish($message);
     }
 }
