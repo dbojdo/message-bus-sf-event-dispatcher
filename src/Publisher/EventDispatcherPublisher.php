@@ -39,14 +39,15 @@ final class EventDispatcherPublisher implements Publisher
     {
         try {
             $messageBusEvent = $this->messageBusEventFactory->create($message);
+            $this->eventDispatcher->dispatch($messageBusEvent->name(), $messageBusEvent->event());
         }
         catch (UnsupportedMessageTypeException $e) {
             throw PublisherUnsupportedMessageTypeException::forMessage($message);
         }
-        catch (EventFromMessageException $e) {
+        catch (\Exception $e) {
             throw CannotPublishMessageException::forMessage($message, 0, $e);
         }
 
-        $this->eventDispatcher->dispatch($messageBusEvent->name(), $messageBusEvent->event());
+
     }
 }
